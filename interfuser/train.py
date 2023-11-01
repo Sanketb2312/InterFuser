@@ -877,7 +877,7 @@ def main():
     #if True:
         args.device = "cuda:%d" % args.local_rank
         torch.cuda.set_device(args.local_rank)
-        #torch.distributed.init_process_group(backend="nccl", init_method="env://")
+        torch.distributed.init_process_group(backend="nccl", init_method="env://")
         args.world_size = torch.distributed.get_world_size()
         args.rank = torch.distributed.get_rank()
         _logger.info(
