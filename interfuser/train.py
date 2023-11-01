@@ -867,14 +867,13 @@ def main():
                 "Metrics not being logged to wandb, try `pip install wandb`"
             )
     args.prefetcher = not args.no_prefetcher
-    #args.distributed = False
+    args.distributed = False
     #if "WORLD_SIZE" in os.environ:
     #    args.distributed = int(os.environ["WORLD_SIZE"]) > 1
     args.device = "cuda:0"
     args.world_size = 1
     args.rank = 0  # global rank
-    #if args.distributed:
-    if True:
+    if args.distributed:
         args.device = "cuda:%d" % args.local_rank
         torch.cuda.set_device(args.local_rank)
         #torch.distributed.init_process_group(backend="nccl", init_method="env://")
