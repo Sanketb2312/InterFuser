@@ -867,17 +867,17 @@ def main():
                 "Metrics not being logged to wandb, try `pip install wandb`"
             )
     args.prefetcher = not args.no_prefetcher
-    args.distributed = True
-    if "WORLD_SIZE" in os.environ:
-        args.distributed = int(os.environ["WORLD_SIZE"]) > 1
+    #args.distributed = False
+    #if "WORLD_SIZE" in os.environ:
+    #    args.distributed = int(os.environ["WORLD_SIZE"]) > 1
     args.device = "cuda:0"
     args.world_size = 1
     args.rank = 0  # global rank
-    if args.distributed:
-    #if True:
+    #if args.distributed:
+    if True:
         args.device = "cuda:%d" % args.local_rank
         torch.cuda.set_device(args.local_rank)
-        torch.distributed.init_process_group(backend="nccl", init_method="env://")
+        #torch.distributed.init_process_group(backend="nccl", init_method="env://")
         args.world_size = torch.distributed.get_world_size()
         args.rank = torch.distributed.get_rank()
         _logger.info(
@@ -969,7 +969,8 @@ def main():
         model = torch.jit.script(model)
 
     linear_scaled_lr = (
-        args.lr * args.batch_size * torch.distributed.get_world_size() / 512.0
+        #args.lr * args.batch_size * torch.distributed.get_world_size() / 512.0
+        args.lr * args.batch_size * args.world_size / 512.0
     )
     args.lr = linear_scaled_lr
     if args.with_backbone_lr:
@@ -980,7 +981,8 @@ def main():
         backbone_linear_scaled_lr = (
             args.backbone_lr
             * args.batch_size
-            * torch.distributed.get_world_size()
+            #* torch.distributed.get_world_size()
+            * args.world_size
             / 512.0
         )
         backbone_weights = []
@@ -1405,7 +1407,8 @@ def train_one_epoch(
             lrl = [param_group["lr"] for param_group in optimizer.param_groups]
             lr = sum(lrl) / len(lrl)
 
-            if args.distributed:
+            #if args.distributed
+            if True:
                 reduced_loss = reduce_tensor(loss.data, args.world_size)
                 losses_m.update(reduced_loss.item(), batch_size)
                 reduced_loss_traffic = reduce_tensor(loss_traffic.data, args.world_size)
@@ -1661,7 +1664,8 @@ def validate(
             )[0]
             stop_sign_error = accuracy(output[3], target[3])[0]
 
-            if args.distributed:
+            #if args.distributed:
+            if True:
                 reduced_loss = reduce_tensor(loss.data, args.world_size)
                 reduced_loss_traffic = reduce_tensor(loss_traffic.data, args.world_size)
                 reduced_loss_velocity = reduce_tensor(
