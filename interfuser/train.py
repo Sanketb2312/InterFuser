@@ -878,8 +878,8 @@ def main():
         args.device = "cuda:%d" % args.local_rank
         torch.cuda.set_device(args.local_rank)
         #torch.distributed.init_process_group(backend="nccl", init_method="env://")
-        args.world_size = torch.distributed.get_world_size()
-        args.rank = torch.distributed.get_rank()
+        #args.world_size = torch.distributed.get_world_size()
+        #args.rank = torch.distributed.get_rank()
         _logger.info(
             "Training in distributed mode with multiple processes, 1 GPU per process. Process %d, total %d."
             % (args.rank, args.world_size)
