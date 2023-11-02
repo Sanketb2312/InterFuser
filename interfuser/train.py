@@ -1049,7 +1049,8 @@ def main():
             load_checkpoint(model_ema.module, args.resume, use_ema=True)
 
     # setup distributed training
-    if args.distributed:
+    #if args.distributed:
+    if True:
         if has_apex and use_amp != "native":
             # Apex DDP preferred unless native amp is activated
             if args.local_rank == 0:
