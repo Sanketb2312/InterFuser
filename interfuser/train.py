@@ -950,7 +950,8 @@ def main():
         model = model.to(memory_format=torch.channels_last)
 
     # setup synchronized BatchNorm for distributed training
-    if args.distributed and args.sync_bn:
+    #if args.distributed and args.sync_bn:
+    if True:
         assert not args.split_bn
         if has_apex and use_amp != "native":
             # Apex SyncBN preferred unless native amp is activated
