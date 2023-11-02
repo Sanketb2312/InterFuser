@@ -877,9 +877,9 @@ def main():
     if True:
         args.device = "cuda:%d" % args.local_rank
         torch.cuda.set_device(args.local_rank)
-        #torch.distributed.init_process_group(backend="nccl", init_method="env://")
-        #args.world_size = torch.distributed.get_world_size()
-        #args.rank = torch.distributed.get_rank()
+        torch.distributed.init_process_group(backend="nccl", init_method="env://")
+        args.world_size = torch.distributed.get_world_size()
+        args.rank = torch.distributed.get_rank()
         _logger.info(
             "Training in distributed mode with multiple processes, 1 GPU per process. Process %d, total %d."
             % (args.rank, args.world_size)
@@ -950,8 +950,7 @@ def main():
         model = model.to(memory_format=torch.channels_last)
 
     # setup synchronized BatchNorm for distributed training
-    #if args.distributed and args.sync_bn:
-    if True:
+    if args.distributed and args.sync_bn:
         assert not args.split_bn
         if has_apex and use_amp != "native":
             # Apex SyncBN preferred unless native amp is activated
@@ -982,7 +981,6 @@ def main():
         backbone_linear_scaled_lr = (
             args.backbone_lr
             * args.batch_size
-            #* torch.distributed.get_world_size()
             * args.world_size
             / 512.0
         )
@@ -1049,8 +1047,7 @@ def main():
             load_checkpoint(model_ema.module, args.resume, use_ema=True)
 
     # setup distributed training
-    #if args.distributed:
-    if True:
+    if args.distributed:
         if has_apex and use_amp != "native":
             # Apex DDP preferred unless native amp is activated
             if args.local_rank == 0:
@@ -1409,7 +1406,7 @@ def train_one_epoch(
             lrl = [param_group["lr"] for param_group in optimizer.param_groups]
             lr = sum(lrl) / len(lrl)
 
-            #if args.distributed
+            #if args.distributed:
             if True:
                 reduced_loss = reduce_tensor(loss.data, args.world_size)
                 losses_m.update(reduced_loss.item(), batch_size)
