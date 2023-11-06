@@ -981,7 +981,6 @@ def main():
         backbone_linear_scaled_lr = (
             args.backbone_lr
             * args.batch_size
-            #* torch.distributed.get_world_size()
             * args.world_size
             / 512.0
         )
@@ -1664,7 +1663,8 @@ def validate(
             )[0]
             stop_sign_error = accuracy(output[3], target[3])[0]
 
-            if args.distributed:
+            #if args.distributed:
+            if True:
                 reduced_loss = reduce_tensor(loss.data, args.world_size)
                 reduced_loss_traffic = reduce_tensor(loss_traffic.data, args.world_size)
                 reduced_loss_velocity = reduce_tensor(
