@@ -950,7 +950,8 @@ def main():
         model = model.to(memory_format=torch.channels_last)
 
     # setup synchronized BatchNorm for distributed training
-    if args.distributed and args.sync_bn:
+    #if args.distributed and args.sync_bn:
+    if True and args.sync_bn:
         assert not args.split_bn
         if has_apex and use_amp != "native":
             # Apex SyncBN preferred unless native amp is activated
@@ -1047,7 +1048,8 @@ def main():
             load_checkpoint(model_ema.module, args.resume, use_ema=True)
 
     # setup distributed training
-    if args.distributed:
+    #if args.distributed:
+    if True:
         if has_apex and use_amp != "native":
             # Apex DDP preferred unless native amp is activated
             if args.local_rank == 0:
@@ -1210,7 +1212,8 @@ def main():
 
     try:
         for epoch in range(start_epoch, num_epochs):
-            if args.distributed and hasattr(loader_train.sampler, "set_epoch"):
+            #if args.distributed and hasattr(loader_train.sampler, "set_epoch"):
+            if True and hasattr(loader_train.sampler, "set_epoch"):
                 loader_train.sampler.set_epoch(epoch)
 
             train_metrics = train_one_epoch(
@@ -1230,7 +1233,8 @@ def main():
                 mixup_fn=mixup_fn,
             )
 
-            if args.distributed and args.dist_bn in ("broadcast", "reduce"):
+            #if args.distributed and args.dist_bn in ("broadcast", "reduce"):
+            if True and args.dist_bn in ("broadcast", "reduce"):
                 if args.local_rank == 0:
                     _logger.info("Distributing BatchNorm running means and vars")
                 distribute_bn(model, args.world_size, args.dist_bn == "reduce")
@@ -1246,7 +1250,8 @@ def main():
             )
 
             if model_ema is not None and not args.model_ema_force_cpu:
-                if args.distributed and args.dist_bn in ("broadcast", "reduce"):
+                #if args.distributed and args.dist_bn in ("broadcast", "reduce"):
+                if True and args.dist_bn in ("broadcast", "reduce"):
                     distribute_bn(model_ema, args.world_size, args.dist_bn == "reduce")
                 ema_eval_metrics = validate(
                     model_ema.module,
@@ -1369,7 +1374,8 @@ def train_one_epoch(
                 + loss_stop_sign * 0.01
             )
 
-        if not args.distributed:
+        #if not args.distributed:
+        if not True:
             losses_traffic.update(loss_traffic.item(), batch_size)
             losses_waypoints.update(loss_waypoints.item(), batch_size)
             losses_m.update(loss.item(), batch_size)
