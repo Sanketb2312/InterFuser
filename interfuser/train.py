@@ -397,6 +397,11 @@ parser.add_argument(
     help="learning rate noise std-dev (default: 1.0)",
 )
 parser.add_argument(
+    "--distributed",
+    type=bool,
+    default=False,
+)
+parser.add_argument(
     "--lr-cycle-mul",
     type=float,
     default=1.0,
